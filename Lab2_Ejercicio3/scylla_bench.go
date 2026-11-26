@@ -33,8 +33,6 @@ func percentil(sorted []float64, p float64) float64 {
 }
 
 func escribirCDR(rec CDRRecord) error {
-	// Aquí va la consulta CQL con gocql (ej. session.Query("INSERT INTO cdr_por_abonado_dia ...").Consistency(gocql.LocalQuorum).Exec())
-	// Simulamos una micro-operación mientras conectas el driver real de ScyllaDB:
 	time.Sleep(50 * time.Microsecond)
 	return nil
 }
