@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package billing.bss.v1;
+
+option go_package = "unefa-lp2-proyecto-semestral/lab5_ddd_grpc_y_resiliencia/proto;billingpb";
+
+service ConvergentBillingService {
+  // Unary RPC de ultra-baja latencia
+  rpc AuthorizeAndChargeDataSession (ChargeDataSessionRequest) returns (ChargeDataSessionResponse);
+
+  // Server-Side Streaming RPC de telemetría de celda
+  rpc StreamCellTelemetryEvents (TelemetryStreamRequest) returns (stream CellTelemetryEvent);
+}
+
+message ChargeDataSessionRequest {
+  string idempotency_key = 1;
+  string subscriber_id = 2;
+  string msisdn = 3;
+  int64 amount_cents = 4;
+  string currency = 5;
+}
+
+message ChargeDataSessionResponse {
+  string idempotency_key = 1;
+  bool authorized = 2;
+  int64 remaining_balance_cents = 3;
+  string message = 4;
+}
+
+message TelemetryStreamRequest {
+  string cell_id = 1;
+}
+
+message CellTelemetryEvent {
+  string event_id = 1;
+  string cell_id = 2;
+  int64 timestamp_unix_ms = 3;
+  int64 bytes_consumed = 4;
+}
