@@ -1,5 +1,3 @@
--- lab7_scylladb_cql_benchmark/esquema_telco_5g.cql
-
 CREATE KEYSPACE IF NOT EXISTS unefa_telco_5g
 WITH replication = {
     'class': 'NetworkTopologyStrategy',
@@ -10,7 +8,7 @@ USE unefa_telco_5g;
 
 CREATE TABLE IF NOT EXISTS cdr_por_abonado_dia (
     msisdn TEXT,
-    bucket_fecha TEXT,          -- Ej: '2026-11-24' (evita particiones gigantes infinitas)
+    bucket_fecha TEXT,
     timestamp_evento TIMESTAMP,
     id_cdr UUID,
     tipo_evento TEXT,
@@ -23,4 +21,4 @@ CREATE TABLE IF NOT EXISTS cdr_por_abonado_dia (
       'compaction_window_unit': 'DAYS',
       'compaction_window_size': 1
   }
-  AND default_time_to_live = 2592000; -- 30 días en segundos (30 * 86400)
+  AND default_time_to_live = 2592000;
