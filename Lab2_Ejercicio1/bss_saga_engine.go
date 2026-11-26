@@ -13,7 +13,6 @@ var (
 	ErrSuscripcionInactiva = errors.New("la suscripción 5G no está activa")
 )
 
-// Dinero es un Value Object inmutable: se opera devolviendo nuevos valores.
 type Dinero struct {
 	MontoCentavos int64
 	Moneda        string
