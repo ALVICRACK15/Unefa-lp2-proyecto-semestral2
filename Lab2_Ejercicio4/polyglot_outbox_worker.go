@@ -29,10 +29,9 @@ type CDRPayload struct {
 	Celda5G         string    `json:"celda_5g"`
 }
 
-// 1. Fase ACID en PostgreSQL: registra transacción + evento outbox en una sola tx.
 func RegistrarOperacionYOutbox(ctx context.Context, db *sql.DB, abonadoID, idempKey string, monto int64, payload CDRPayload) error {
 	if db == nil {
-		return nil // Permite probar la estructura sin conexión activa a DB
+		return nil
 	}
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
@@ -73,7 +72,6 @@ func RegistrarOperacionYOutbox(ctx context.Context, db *sql.DB, abonadoID, idemp
 	return tx.Commit()
 }
 
-// 2. Reclama lote pendiente usando FOR UPDATE SKIP LOCKED para evitar contención entre workers.
 func reclamarLotePendiente(ctx context.Context, db *sql.DB, limite int) ([]OutboxEvent, error) {
 	if db == nil {
 		return nil, nil
@@ -115,14 +113,12 @@ func reclamarLotePendiente(ctx context.Context, db *sql.DB, limite int) ([]Outbo
 	return eventos, nil
 }
 
-// 3. Proyección a ScyllaDB (LOCAL_QUORUM) y confirmación en PostgreSQL.
 func proyectarEvento(ctx context.Context, db *sql.DB, ev OutboxEvent) error {
 	var p CDRPayload
 	if err := json.Unmarshal(ev.PayloadJSON, &p); err != nil {
 		return err
 	}
 
-	// Aquí ejecutarías el INSERT en ScyllaDB (cdr_por_abonado_dia) con consistencia LOCAL_QUORUM.
 	_ = p
 
 	if db != nil {
@@ -170,7 +166,7 @@ func main() {
 	defer cancel()
 
 	var (
-		db *sql.DB // Conectar con sql.Open("postgres", dsn) al ejecutar contra PostgreSQL 16
+		db *sql.DB
 		wg sync.WaitGroup
 	)
 
